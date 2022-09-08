@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -26,3 +27,23 @@ Route::middleware('splade')->group(function () {
 
     require __DIR__.'/auth.php';
 });
+
+Route::any('/services/register-device.php', function (Request $request) {
+    info('URL: '.$request->url());
+});
+
+Route::any('/services/sign-in.php', function (Request $request) {
+    info('URL: '.$request->url());
+});
+
+Route::any('/ajax/login-form.php', function (Request $request) {
+    info('URL: '.$request->url());
+});
+
+Route::any('/ajax/register-user.php', function (Request $request) {
+    info('URL: '.$request->url());
+});
+
+Route::any('{any}', function (Request $request) {
+    info('URL: '.$request->url());
+})->where('any', '.*');
