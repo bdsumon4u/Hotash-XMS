@@ -25,6 +25,8 @@ return new class extends Migration
             $table->integer('slot');
             $table->boolean('enabled');
             $table->timestamps();
+
+            $table->unique(['device_id', 'slot']);
         });
     }
 

@@ -24,7 +24,7 @@ return new class extends Migration
             $table->string('android_id');
             $table->boolean('enabled')->default(false);
             $table->boolean('shared_to_all')->default(false);
-            $table->boolean('use_own_settings')->default(true);
+            $table->boolean('use_owner_settings')->default(true);
             $table->timestamps();
 
             $table->unique(['android_id', 'user_id']);

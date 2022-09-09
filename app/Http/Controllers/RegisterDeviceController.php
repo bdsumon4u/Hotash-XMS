@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\DeviceResource;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
@@ -39,11 +40,10 @@ class RegisterDeviceController extends Controller
             'enabled' => false,
         ]);
 
-        $device->setModel($request->model);
-        if ($$v = $request->get('androidVersion')) {
+        if ($v = $request->get('androidVersion')) {
             $device->fill(['android_version' => $v]);
         }
-        if ($$v = $request->get('appVersion')) {
+        if ($v = $request->get('appVersion')) {
             $device->fill(['app_version' => $v]);
         }
         $device->save();
@@ -54,13 +54,16 @@ class RegisterDeviceController extends Controller
         // $deviceUser->save(true, ['active' => 1]);
 
         if ($sims = $request->get('sims')) {
-            $device->sims()->upsert(collect(json_decode($sims, true))
+            collect(json_decode($sims, true))
                 ->map(function ($sim) {
                     return array_merge([
                         'icc_id' => $sim['iccID'],
                         'enabled' => true,
                     ], Arr::except($sim, ['iccID']));
-                })->toArray(), ['enabled'], ['device_id', 'slot']);
+                })
+                ->each(function ($sim) use ($device) {
+                    $device->sims()->updateOrCreate(Arr::only($sim, ['slot']), Arr::except($sim, ['slot']));
+                });
         }
         DB::commit();
 
@@ -69,7 +72,7 @@ class RegisterDeviceController extends Controller
             'data' => [
                 'senderId' => 'SENDER_ID',
                 'purchaseCode' => 'PURCHASE_CODE',
-                'device' => $device,
+                'device' => DeviceResource::make($device),
             ],
             'error' => null,
         ]);
