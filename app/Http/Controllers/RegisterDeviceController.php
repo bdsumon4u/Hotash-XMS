@@ -70,8 +70,8 @@ class RegisterDeviceController extends Controller
         return response()->json([
             'success' => true,
             'data' => [
-                'senderId' => 'SENDER_ID',
-                'purchaseCode' => 'PURCHASE_CODE',
+                'senderId' => '294830130603',
+                'purchaseCode' => '',
                 'device' => DeviceResource::make($device),
             ],
             'error' => null,
