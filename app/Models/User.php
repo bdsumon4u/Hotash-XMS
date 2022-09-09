@@ -6,6 +6,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Hash;
 use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
@@ -41,4 +42,18 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    public static function fromRequest($request)
+    {
+        if ($key = $request->has('key')) {
+            return static::firstWhere(compact('key'));
+        }
+
+        $user = static::where('email', $request->email)->first();
+        if ($user && Hash::check($request->password, $user->password)) {
+            return $user;
+        }
+
+        return null;
+    }
 }
