@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\RegisterDeviceController;
+use App\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -29,8 +30,8 @@ Route::middleware('splade')->group(function () {
     require __DIR__.'/auth.php';
 });
 
-Route::any('/services/register-device.php', RegisterDeviceController::class);
+Route::post('/services/register-device.php', RegisterDeviceController::class)->withoutMiddleware(VerifyCsrfToken::class);
 
-Route::any('{any}', function (Request $request) {
-    info('URL: '.$request->url());
-})->where('any', '.*');
+// Route::any('{any}', function (Request $request) {
+//     info('URL: '.$request->url());
+// })->where('any', '.*');

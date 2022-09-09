@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 
 class RegisterDeviceController extends Controller
@@ -38,7 +39,7 @@ class RegisterDeviceController extends Controller
             'enabled' => false,
         ]);
 
-        $device->setModel($_POST['model']);
+        $device->setModel($request->model);
         if ($$v = $request->get('androidVersion')) {
             $device->fill(['android_version' => $v]);
         }
@@ -53,7 +54,13 @@ class RegisterDeviceController extends Controller
         // $deviceUser->save(true, ['active' => 1]);
 
         if ($sims = $request->get('sims')) {
-            info('sims', json_decode($sims, true));
+            $device->sims()->upsert(collect(json_decode($sims, true))
+                ->map(function ($sim) {
+                    return array_merge([
+                        'icc_id' => $sim['iccID'],
+                        'enabled' => true,
+                    ], Arr::except($sim, ['iccID']));
+                })->toArray(), ['enabled'], ['device_id', 'slot']);
         }
         DB::commit();
 
